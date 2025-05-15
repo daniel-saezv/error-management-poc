@@ -1,0 +1,12 @@
+- request:
+    method: POST
+    url: /api/login
+    body:
+      username: $
+      password: $
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    body: 
+      username: "TestUser"
