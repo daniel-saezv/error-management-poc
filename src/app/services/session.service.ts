@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { Session } from '../models/session';
 import { environment } from '../../environments/environment';
 
@@ -21,19 +21,20 @@ export class SessionService {
   public readonly isLoggedIn: Observable<boolean> =
     this._isLoggedIn.asObservable();
 
-  login(username: string, password: string) {
+  login(username: string, password: string):Observable<Session | null> {
     return this.httpClient
       .post<Session>(`${environment.apiUrl}/login`, { username, password })
-      .subscribe({
-        next: (response) => {
-          console.log('Login successful', response);
+      .pipe(
+        tap((response) => {
           this._session.next(response);
           this._isLoggedIn.next(true);
-        },
-        error: (error) => {
-          console.error('Login failed', error);
+        }),
+        catchError((error) => {
+          console.error('Error during login:', error);
+          this._session.next(null);
           this._isLoggedIn.next(false);
-        },
-      });
+          return this._session;
+        })
+      );
   }
 }

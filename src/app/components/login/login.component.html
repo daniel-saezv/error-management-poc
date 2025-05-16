@@ -1,7 +1,10 @@
-@if (sessionService.isLoggedIn | async) {
-<p>Welcome back, {{ (sessionService.session | async)?.username }}!</p>
-} @else {
-<p>Please log in to continue.</p>
+@if (loginResult$ | async; as session) { @if(sessionService.isLoggedIn
+| async){
+<p>Welcome back, {{ session?.username }}!</p>
+}@else {
+<ng-container *ngTemplateOutlet="noLogin" />
+} } @else {
+<ng-container *ngTemplateOutlet="noLogin" />
 }
 <form [formGroup]="loginForm" (ngSubmit)="login()">
   <div>
@@ -14,3 +17,7 @@
   </div>
   <button type="submit" [disabled]="loginForm.invalid">Login</button>
 </form>
+
+<ng-template #noLogin>
+  <p>Please log in to continue.</p>
+</ng-template>
